@@ -1,7 +1,9 @@
 package com.Jguides.spingboot.config;
 
+import com.Jguides.spingboot.security.JpaUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -15,21 +17,51 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(); // default strength 10 is fine
+        return new BCryptPasswordEncoder();
+    }
+
+    // No @Bean userDetailsService(...) here — let Spring pick up your @Service JpaUserDetailsService
+
+    @Bean
+    public DaoAuthenticationProvider authenticationProvider(
+            JpaUserDetailsService jpaUserDetailsService,
+            PasswordEncoder encoder
+    ) {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setUserDetailsService(jpaUserDetailsService);
+        provider.setPasswordEncoder(encoder);
+        return provider;
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http,
+                                                   DaoAuthenticationProvider authProvider) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
+                .authenticationProvider(authProvider)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/css/**","/js/**","/images/**").permitAll()
-                        .requestMatchers("/login","/error").permitAll()
-                        .requestMatchers("/assets/").authenticated() // list requires login
+                        .requestMatchers("/css/**", "/js/**", "/images/**", "/webjars/**").permitAll()
+                        .requestMatchers("/login", "/error").permitAll()
+                        // Dashboard requires authentication
+                        .requestMatchers("/", "/dashboard").authenticated()
+                        // Users area restricted to ADMIN_MANAGER
+                        .requestMatchers("/users/**").hasRole("ADMIN_MANAGER")
+                        // Warehouses & Assets accessible to managers
+                        .requestMatchers("/warehouses/**", "/assets/**").hasAnyRole("ADMIN_MANAGER", "STORE_MANAGER")
                         .anyRequest().authenticated()
                 )
-                .formLogin(Customizer.withDefaults())
-                .logout(Customizer.withDefaults());
+                .formLogin(login -> login
+                        .loginPage("/login")
+                        .defaultSuccessUrl("/dashboard", true)
+                        .permitAll()
+                )
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/login?logout")
+                        .invalidateHttpSession(true)
+                        .deleteCookies("JSESSIONID")
+                        .permitAll()
+                );
 
         return http.build();
     }

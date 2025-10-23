@@ -5,10 +5,7 @@ import com.Jguides.spingboot.Model.Warehouse;
 
 public interface WarehouseService {
     List<Warehouse> getAllWarehouses();
-
-    Warehouse getWarehouseById(Long id);
-
+    Warehouse getWarehouseById(Integer id);
     Warehouse saveWarehouse(Warehouse warehouse);
-
-    void deleteWarehouse(Long id);
+    void deleteWarehouse(Integer id);
 }

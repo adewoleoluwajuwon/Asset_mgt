@@ -1,0 +1,70 @@
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8" />
+    <title>Dashboard</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg bg-body-tertiary border-bottom">
+    <div class="container">
+        <a class="navbar-brand" href="#" th:text="${#authentication?.name}">User</a>
+        <div class="ms-auto d-flex align-items-center gap-2">
+            <form th:action="@{/logout}" method="post" class="m-0">
+                <button class="btn btn-outline-secondary btn-sm" type="submit">Logout</button>
+            </form>
+        </div>
+    </div>
+</nav>
+
+<div class="container py-5">
+    <h3 class="mb-4">Choose an operation</h3>
+
+    <div class="row g-4">
+        <!-- Assets (ADMIN_MANAGER or STORE_MANAGER) -->
+        <div class="col-12 col-md-6 col-lg-4" sec:authorize="hasAnyRole('ADMIN_MANAGER','STORE_MANAGER')">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">Asset List</h5>
+                    <p class="card-text flex-grow-1">View, search, create, edit and delete assets.</p>
+                    <div class="d-grid gap-2">
+                        <a class="btn btn-primary" th:href="@{/assets/}">Open Asset List</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Warehouses (ADMIN_MANAGER or STORE_MANAGER) -->
+        <div class="col-12 col-md-6 col-lg-4" sec:authorize="hasAnyRole('ADMIN_MANAGER','STORE_MANAGER')">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">Warehouse List</h5>
+                    <p class="card-text flex-grow-1">Manage warehouses (view, create, edit, delete).</p>
+                    <div class="d-grid gap-2">
+                        <a class="btn btn-primary" th:href="@{/warehouses/}">Open Warehouse List</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Users (ADMIN_MANAGER only) -->
+        <div class="col-12 col-md-6 col-lg-4" sec:authorize="hasRole('ADMIN_MANAGER')">
+            <div class="card h-100 shadow-sm border-warning">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">Users List</h5>
+                    <p class="card-text flex-grow-1">Add new users, edit roles, reset passwords, or delete users.</p>
+                    <div class="d-grid gap-2">
+                        <a class="btn btn-warning" th:href="@{/users/}">Open Users</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

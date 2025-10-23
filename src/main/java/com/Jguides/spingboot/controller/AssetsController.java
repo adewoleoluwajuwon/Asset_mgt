@@ -48,20 +48,20 @@ public class AssetsController {
     }
 
     // ====== SAVE (managers only) ======
+    // ====== SAVE (managers only) ======
     @PreAuthorize("hasAnyRole('ADMIN_MANAGER','STORE_MANAGER')")
     @PostMapping("/save")
     public String saveAsset(@ModelAttribute("asset") Assets asset) {
-        // Resolve nested IDs into managed entities
-        Long statusId = (asset.getStatus() != null ? asset.getStatus().getId() : null);
-        Integer whId  = (asset.getWarehouse() != null ? asset.getWarehouse().getId() : null);
+        Long statusId = (asset.getStatus() != null ? asset.getStatus().getId() : null);     // Long is fine for status
+        Integer whId  = (asset.getWarehouse() != null ? asset.getWarehouse().getId() : null); // Integer for warehouse
 
         if (statusId == null || whId == null) {
             throw new IllegalArgumentException("Status and Warehouse are required");
         }
 
-        // Your services expose getAssetStatusById + getWarehouseById(Long)
-        asset.setStatus(assetStatusService.getAssetStatusById(statusId));
-        asset.setWarehouse(warehouseService.getWarehouseById(whId.longValue())); // convert Integer -> Long
+        // resolve entities using correct ID types
+        asset.setStatus(assetStatusService.getAssetStatusById(statusId)); // expects Long
+        asset.setWarehouse(warehouseService.getWarehouseById(whId));      // expects Integer
 
         assetService.saveAsset(asset);
         return "redirect:/assets/";
