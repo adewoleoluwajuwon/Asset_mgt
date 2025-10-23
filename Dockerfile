@@ -1,14 +1,13 @@
-# Use an official OpenJDK image
-FROM openjdk:17-jdk-slim
-
-# Set the working directory
+# ---- Build Stage ----
+FROM maven:3.9.6-eclipse-temurin-17 AS build
 WORKDIR /app
+COPY pom.xml .
+COPY src ./src
+RUN mvn clean package -DskipTests
 
-# Copy the JAR file from the target folder
-COPY target/*.jar app.jar
-
-# Expose the port your app runs on
+# ---- Run Stage ----
+FROM eclipse-temurin:17-jdk-jammy
+WORKDIR /app
+COPY --from=build /app/target/*.jar app.jar
 EXPOSE 8080
-
-# Run the JAR
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java","-jar","app.jar"]
