@@ -2,121 +2,67 @@ package com.Jguides.spingboot.Model;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToMany;
-//import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "assets")
-
 public class Assets {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
-	
-	@Column(name = "description")
-	public String description;
-	
-	@Column(name = "unit_cost")
-	public BigDecimal unitCost;
-	
-	@Column(name = "quantity")
-	public int quantity;
-	
-	@Column(name = "quantity_available")
-	public int quantityAvailable;
-	
-	@Column(name = "total_cost", insertable = false, updatable = false) 
-	public BigDecimal totalCost;
-	
-	@Column(name = "purchase_date")
-	public LocalDate purchaseDate;
-	
-	 @ManyToMany
-	 @JoinColumn(name = "warehouse_id", nullable = false)
-	 private Warehouse warehouse;
 
-//    @ManyToOne
-//    @JoinColumn(name = "status_id",  = false)
-//    private Status status;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-	public Long getId() {
-		return id;
-	}
+    @Column(name = "description", nullable = false)
+    private String description;
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    @Column(name = "unit_cost", nullable = false)
+    private BigDecimal unitCost;
 
-	public String getDescription() {
-		return description;
-	}
+    @Column(name = "quantity", nullable = false)
+    private int quantity;
 
-	public void setDescription(String description) {
-		this.description = description;
-	}
+    @Column(name = "quantity_available", nullable = false)
+    private int quantityAvailable;
 
-	public BigDecimal getUnitCost() {
-		return unitCost;
-	}
+    @Column(name = "total_cost", insertable = false, updatable = false)
+    private BigDecimal totalCost;
 
-	public void setUnitCost(BigDecimal unitCost) {
-		this.unitCost = unitCost;
-	}
+    @Column(name = "purchase_date", nullable = false)
+    private LocalDate purchaseDate;
 
-	public int getQuantity() {
-		return quantity;
-	}
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "warehouse_id", nullable = false)
+    private Warehouse warehouse;
 
-	public void setQuantity(int quantity) {
-		this.quantity = quantity;
-	}
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "status_id", nullable = false)
+    private AssetStatus status;
 
-	public int getQuantityAvailable() {
-		return quantityAvailable;
-	}
+    // Getters and setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-	public void setQuantityAvailable(int quantityAvailable) {
-		this.quantityAvailable = quantityAvailable;
-	}
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
 
-	public BigDecimal getTotalCost() {
-		return totalCost;
-	}
+    public BigDecimal getUnitCost() { return unitCost; }
+    public void setUnitCost(BigDecimal unitCost) { this.unitCost = unitCost; }
 
-	public void setTotalCost(BigDecimal totalCost) {
-		this.totalCost = totalCost;
-	}
+    public int getQuantity() { return quantity; }
+    public void setQuantity(int quantity) { this.quantity = quantity; }
 
-	public LocalDate getPurchaseDate() {
-		return purchaseDate;
-	}
+    public int getQuantityAvailable() { return quantityAvailable; }
+    public void setQuantityAvailable(int quantityAvailable) { this.quantityAvailable = quantityAvailable; }
 
-	public void setPurchaseDate(LocalDate purchaseDate) {
-		this.purchaseDate = purchaseDate;
-	}
+    public BigDecimal getTotalCost() { return totalCost; }
+    public void setTotalCost(BigDecimal totalCost) { this.totalCost = totalCost; }
 
-	public Warehouse getWarehouse() {
-		return warehouse;
-	}
+    public LocalDate getPurchaseDate() { return purchaseDate; }
+    public void setPurchaseDate(LocalDate purchaseDate) { this.purchaseDate = purchaseDate; }
 
-	public void setWarehouse(Warehouse warehouse) {
-		this.warehouse = warehouse;
-	}
+    public Warehouse getWarehouse() { return warehouse; }
+    public void setWarehouse(Warehouse warehouse) { this.warehouse = warehouse; }
 
-//	public Status getStatus() {
-//		return status;
-//	}
-//
-//	public void setStatus(Status status) {
-//		this.status = status;
-//	}
-    
+    public AssetStatus getStatus() { return status; }
+    public void setStatus(AssetStatus status) { this.status = status; }
 }

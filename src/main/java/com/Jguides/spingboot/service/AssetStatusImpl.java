@@ -9,32 +9,34 @@ import com.Jguides.spingboot.Model.AssetStatus;
 import com.Jguides.spingboot.repository.AssetStatusRepository;
 
 @Service
-public class AssetStatusImpl implements AssetStatusService{
-	@Autowired
-	AssetStatusRepository assetStatusRepository;
-	
-	@Override
-	public List<AssetStatus> getAllAssetStatus(){
-		return assetStatusRepository.findAll();		
-	}
-	
-	@Override
-	public AssetStatus getAssetStatusById(Long id) {
-		return assetStatusRepository.findById(id).orElse(null);
-	}
-	
-	@Override
-	public void deleteAssetStatus(Long id) {
-		assetStatusRepository.deleteById(id);
-	}
-	
-	@Override
-	public List<AssetStatus> searchAssetStatus(String keyword){
-		return assetStatusRepository.findByDescriptionContainingIgnoreCase(keyword);
-	}
+public class AssetStatusImpl implements AssetStatusService {
 
-	@Override
-	public AssetStatus saveAssetStatus(AssetStatus assetStatus) {	
-		return assetStatusRepository.save(assetStatus);
-	}
+    @Autowired
+    private AssetStatusRepository assetStatusRepository;
+
+    @Override
+    public List<AssetStatus> getAllAssetStatus() {
+        return assetStatusRepository.findAll();
+    }
+
+    @Override
+    public AssetStatus getAssetStatusById(Long id) {
+        return assetStatusRepository.findById(id).orElse(null);
+    }
+
+    @Override
+    public void deleteAssetStatus(Long id) {
+        assetStatusRepository.deleteById(id);
+    }
+
+    @Override
+    public List<AssetStatus> searchAssetStatus(String keyword) {
+
+        return assetStatusRepository.findByStatusNameContainingIgnoreCase(keyword);
+    }
+
+    @Override
+    public AssetStatus saveAssetStatus(AssetStatus assetStatus) {
+        return assetStatusRepository.save(assetStatus);
+    }
 }

@@ -10,4 +10,6 @@ public class AssetMgtApplication {
 		SpringApplication.run(AssetMgtApplication.class, args);
 	}
 
+    
+
 }

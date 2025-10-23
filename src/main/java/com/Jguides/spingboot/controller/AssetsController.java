@@ -1,65 +1,91 @@
 package com.Jguides.spingboot.controller;
 
-
+import com.Jguides.spingboot.Model.Assets;
+import com.Jguides.spingboot.Model.AssetStatus;
+import com.Jguides.spingboot.Model.Warehouse;
+import com.Jguides.spingboot.service.AssetService;
+import com.Jguides.spingboot.service.AssetStatusService;
+import com.Jguides.spingboot.service.WarehouseService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.*;
-
-import com.Jguides.spingboot.Model.Assets;
-import com.Jguides.spingboot.service.AssetService;
-
-
 @Controller
-
-
+@RequestMapping("/assets")
 public class AssetsController {
-	@Autowired
-	private AssetService assetService;
-	
-	@GetMapping("/")
-	public String showAssetsPage(Model model, @RequestParam(value = "keyword", required = false) String keyword) {
-		List<Assets> listAssets;
-		if(keyword != null && !keyword.isEmpty()) {
-			listAssets = assetService.searchAssets(keyword);
-			model.addAttribute("keyword", keyword);
-		}else {
-			listAssets = assetService.getAllAssets();
-		}
-		model.addAttribute("assets", listAssets);
-		return "index";
-	}
-	
-	//Form to add new asset
-	@GetMapping("/showNewAssetForm")
-	public String showNewAssetForm(Model model){
-		Assets assets = new Assets();
-		model.addAttribute("assets", assets);
-		return "index";
-	}
-	
-	//Save new or updated asset
-	@PostMapping("/saveAsset")
-	public String saveAsset(@ModelAttribute("asset") Assets asset) {
-		assetService.saveAsset(asset);
-		return "redirect:/";
-	}
-	
-	@GetMapping("/showFormForUpdateAsset/{id}")
-	public String showFormForUpdateAsset(@PathVariable(value = "id") Long id, Model model) {
-		Assets asset = assetService.getAssetById(id);
-		model.addAttribute("asset", asset);
-		
-		return "update_asset";
-	}
-	
-	@GetMapping("/deleteAsset/{id}")
-	public String deleteAsset(@PathVariable(value = "id") Long id) {
-		assetService.getAssetById(id);
-		return "redirect:/"; 	
-	}	
+
+    @Autowired private AssetService assetService;
+    @Autowired private WarehouseService warehouseService;
+    @Autowired private AssetStatusService assetStatusService;
+
+    // ====== LIST (any authenticated user) ======
+    @GetMapping("/")
+    public String listAssets(@RequestParam(value = "keyword", required = false) String keyword, Model model) {
+        List<Assets> listAssets = (keyword == null || keyword.isBlank())
+                ? assetService.getAllAssets()
+                : assetService.searchAssets(keyword.trim()); // <-- use your interface method
+        model.addAttribute("assets", listAssets);
+        model.addAttribute("keyword", keyword);
+        return "index";
+    }
+
+    // ====== NEW (managers only) ======
+    @PreAuthorize("hasAnyRole('ADMIN_MANAGER','STORE_MANAGER')")
+    @GetMapping("/new")
+    public String showNewAssetForm(Model model) {
+        Assets asset = new Assets();
+        asset.setWarehouse(new Warehouse());     // for binding warehouse.id
+        asset.setStatus(new AssetStatus());      // for binding status.id
+
+        model.addAttribute("asset", asset);
+        model.addAttribute("warehouses", warehouseService.getAllWarehouses());
+        model.addAttribute("statuses", assetStatusService.getAllAssetStatus());
+        return "new_asset";
+    }
+
+    // ====== SAVE (managers only) ======
+    @PreAuthorize("hasAnyRole('ADMIN_MANAGER','STORE_MANAGER')")
+    @PostMapping("/save")
+    public String saveAsset(@ModelAttribute("asset") Assets asset) {
+        // Resolve nested IDs into managed entities
+        Long statusId = (asset.getStatus() != null ? asset.getStatus().getId() : null);
+        Integer whId  = (asset.getWarehouse() != null ? asset.getWarehouse().getId() : null);
+
+        if (statusId == null || whId == null) {
+            throw new IllegalArgumentException("Status and Warehouse are required");
+        }
+
+        // Your services expose getAssetStatusById + getWarehouseById(Long)
+        asset.setStatus(assetStatusService.getAssetStatusById(statusId));
+        asset.setWarehouse(warehouseService.getWarehouseById(whId.longValue())); // convert Integer -> Long
+
+        assetService.saveAsset(asset);
+        return "redirect:/assets/";
+    }
+
+    // ====== EDIT (managers only) ======
+    @PreAuthorize("hasAnyRole('ADMIN_MANAGER','STORE_MANAGER')")
+    @GetMapping("/edit/{id}")
+    public String editAsset(@PathVariable("id") Long id, Model model) {
+        Assets asset = assetService.getAssetById(id);
+        if (asset.getWarehouse() == null) asset.setWarehouse(new Warehouse());
+        if (asset.getStatus() == null) asset.setStatus(new AssetStatus());
+
+        model.addAttribute("asset", asset);
+        model.addAttribute("warehouses", warehouseService.getAllWarehouses());
+        model.addAttribute("statuses", assetStatusService.getAllAssetStatus());
+        return "new_asset";
+    }
+
+    // ====== DELETE (managers only) ======
+    @PreAuthorize("hasAnyRole('ADMIN_MANAGER','STORE_MANAGER')")
+    @GetMapping("/delete/{id}")
+    public String deleteAsset(@PathVariable("id") Long id) {
+        assetService.deleteAsset(id);
+        return "redirect:/assets/";
+    }
 }

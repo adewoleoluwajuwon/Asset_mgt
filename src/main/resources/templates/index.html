@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Assets List</title>
+    <title>Asset Inventory</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 </head>
 <body>
@@ -9,17 +9,19 @@
     <h2 class="mb-4">Asset Inventory</h2>
 
     <!-- Search Form -->
-    <form th:action="@{/}" method="get" class="row mb-3">
+    <form th:action="@{/assets/}" method="get" class="row mb-3">
         <div class="col-md-10">
             <input type="text" name="keyword" class="form-control" placeholder="Search by description" th:value="${keyword}">
         </div>
         <div class="col-md-2">
-            <button class="btn btn-primary w-100">Search</button>
+            <button class="btn btn-outline-primary w-100" type="submit">Search</button>
         </div>
     </form>
 
-    <!-- Add New Asset -->
-    <a th:href="@{/showNewAssetForm}" class="btn btn-success mb-3">Add New Asset</a>
+    <div class="mb-3 d-flex gap-2">
+        <!-- Only managers should see "Add New" button; you can also hide with sec:authorize if you use thymeleaf-extras-springsecurity6 -->
+        <a th:href="@{/assets/new}" class="btn btn-success">Add New Asset</a>
+    </div>
 
     <!-- Asset Table -->
     <table class="table table-bordered">
@@ -33,6 +35,7 @@
             <th>Purchase Date</th>
             <th>Status</th>
             <th>Warehouse</th>
+            <th>Actions</th>
         </tr>
         </thead>
         <tbody>
@@ -44,10 +47,10 @@
             <td th:text="${asset.totalCost}"></td>
             <td th:text="${asset.purchaseDate}"></td>
             <td th:text="${asset.status.statusName}"></td>
-            <td th:text="${asset.location.locationName}"></td>
-            <td>
-                <a th:href="@{'/showFormForUpdateAsset/' + ${asset.id}}" class="btn btn-warning btn-sm">Edit</a>
-                <a th:href="@{'/deleteAsset/' + ${asset.id}}" class="btn btn-danger btn-sm"
+            <td th:text="${asset.warehouse.warehouse_name}"></td>
+            <td class="d-flex gap-2">
+                <a th:href="@{'/assets/edit/' + ${asset.id}}" class="btn btn-warning btn-sm">Edit</a>
+                <a th:href="@{'/assets/delete/' + ${asset.id}}" class="btn btn-danger btn-sm"
                    onclick="return confirm('Are you sure you want to delete this asset?')">Delete</a>
             </td>
         </tr>

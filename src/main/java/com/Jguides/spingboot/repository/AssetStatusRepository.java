@@ -11,6 +11,8 @@ import com.Jguides.spingboot.Model.AssetStatus;
 
 public interface AssetStatusRepository extends JpaRepository<AssetStatus, Long>{
 
-	List<AssetStatus> findByDescriptionContainingIgnoreCase(String keyword);
+//	List<AssetStatus> findByDescriptionContainingIgnoreCase(String keyword);
+
+    List<AssetStatus> findByStatusNameContainingIgnoreCase(String statusName);
 
 }
