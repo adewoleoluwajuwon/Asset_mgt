@@ -1,0 +1,65 @@
+<!-- templates/fragments/scripts.html -->
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="pwaScripts">
+    <script>
+        // ---- Service worker registration (safe to run on every page) ----
+        if ('serviceWorker' in navigator) {
+          window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/service-worker.js')
+              .then(reg => console.log('✅ SW registered:', reg.scope))
+              .catch(err => console.error('❌ SW registration failed:', err));
+          });
+        }
+
+        // ---- Install button logic (Android/Desktop) ----
+        let deferredPrompt; // holds the event for later
+        const installBtn = document.getElementById('pwaInstallBtn');
+        const iosHint = document.getElementById('iosInstallHint');
+
+        // Helper: are we already installed?
+        const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+
+        // Helper: detect iOS (very simple UA check)
+        const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+
+        // If already installed, ensure button and hints are hidden
+        function hideInstallUI() {
+          if (installBtn) installBtn.classList.add('d-none');
+          if (iosHint) iosHint.classList.add('d-none');
+        }
+
+        if (isStandalone) {
+          hideInstallUI();
+        } else {
+          // Desktop/Android: browser fires this beforeinstallprompt when criteria are met
+          window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();           // stop the default mini-infobar
+            deferredPrompt = e;           // stash the event
+            if (installBtn) installBtn.classList.remove('d-none'); // show your button
+          });
+
+          // When user clicks your button, trigger the prompt
+          if (installBtn) {
+            installBtn.addEventListener('click', async () => {
+              if (!deferredPrompt) return;      // no prompt available yet
+              deferredPrompt.prompt();          // show browser UI
+              const choice = await deferredPrompt.userChoice;
+              console.log('PWA install choice:', choice.outcome);
+              deferredPrompt = null;            // clear it
+              installBtn.classList.add('d-none');
+            });
+          }
+
+          // iOS: no beforeinstallprompt; show a small hint instead
+          if (isIOS && iosHint) {
+            iosHint.classList.remove('d-none');
+          }
+        }
+
+        // Optional: when installed, hide UI
+        window.addEventListener('appinstalled', () => {
+          console.log('PWA installed');
+          hideInstallUI();
+        });
+    </script>
+</th:block>
