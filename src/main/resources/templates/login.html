@@ -51,21 +51,6 @@
             <p class="text-center text-muted small mt-3">Use seeded users: <code>admin/admin123</code> or <code>store/store123</code></p>
         </div>
     </div>
-
-    <div class="container">
-        <a class="navbar-brand" href="#" th:text="${#authentication?.name}">User</a>
-
-        <div class="ms-auto d-flex align-items-center gap-2">
-            <!-- Install App button: hidden by default, shown by JS when eligible -->
-            <button id="pwaInstallBtn" class="btn btn-sm btn-primary d-none" type="button">
-                Install App
-            </button>
-
-            <form th:action="@{/logout}" method="post" class="m-0">
-                <button class="btn btn-outline-secondary btn-sm" type="submit">Logout</button>
-            </form>
-        </div>
-    </div>
 </div>
 
 <!-- Register service worker -->
