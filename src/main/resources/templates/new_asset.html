@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="~{fragments/head :: pwaHead('Page Title')}"></th:block>
 <head>
     <th:block th:with="titleText=${asset.id == null ? 'Add New Asset' : 'Edit Asset'}">
         <title th:text="${titleText}">Add / Edit Asset</title>

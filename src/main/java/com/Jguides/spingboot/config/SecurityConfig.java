@@ -41,15 +41,22 @@ public class SecurityConfig {
                 .authenticationProvider(authProvider)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/css/**", "/js/**", "/images/**", "/webjars/**").permitAll()
+                        .requestMatchers(
+                                "/manifest.json",
+                                "/service-worker.js",
+                                "/icons/**",
+                                "/offline.html",
+                                "/favicon.ico",
+                                "/apple-touch-icon.png"
+                        ).permitAll()
                         .requestMatchers("/login", "/error").permitAll()
-                        // Dashboard requires authentication
                         .requestMatchers("/", "/dashboard").authenticated()
-                        // Users area restricted to ADMIN_MANAGER
                         .requestMatchers("/users/**").hasRole("ADMIN_MANAGER")
-                        // Warehouses & Assets accessible to managers
-                        .requestMatchers("/warehouses/**", "/assets/**").hasAnyRole("ADMIN_MANAGER", "STORE_MANAGER")
+                        .requestMatchers("/warehouses/**", "/assets/**")
+                        .hasAnyRole("ADMIN_MANAGER", "STORE_MANAGER")
                         .anyRequest().authenticated()
                 )
+
                 .formLogin(login -> login
                         .loginPage("/login")
                         .defaultSuccessUrl("/dashboard", true)
