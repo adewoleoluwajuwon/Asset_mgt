@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${pageTitle}">Create/Edit Status</title>
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container mt-4">
+
+    <!-- Back navigation -->
+    <div class="mb-3">
+        <a th:href="@{/statuses/}" class="text-decoration-none">&larr; Back to Statuses</a>
+    </div>
+
+    <!-- Page Title -->
+    <h2 th:text="${pageTitle}">Create Status</h2>
+
+    <!-- Flash Messages -->
+    <div th:if="${success}" class="alert alert-success py-2 mb-3" th:text="${success}"></div>
+    <div th:if="${error}" class="alert alert-danger py-2 mb-3" th:text="${error}"></div>
+
+    <!-- Warning if editing a status that's in use -->
+    <div th:if="${isEdit and inUse}" class="alert alert-warning">
+        <strong>Note:</strong> This status is currently in use by one or more assets.
+        Editing may affect those assets.
+    </div>
+
+    <!-- Form -->
+    <form th:object="${status}"
+          th:action="${isEdit} ? @{/statuses/update/{id}(id=${status.id})} : @{/statuses}"
+          method="post"
+          class="card p-4">
+
+        <!-- Status Name Field -->
+        <div class="mb-3">
+            <label for="statusName" class="form-label">Status Name <span class="text-danger">*</span></label>
+            <input type="text"
+                   class="form-control"
+                   id="statusName"
+                   th:field="*{statusName}"
+                   placeholder="Enter status name (e.g., AVAILABLE, IN_USE, UNDER_MAINTENANCE)">
+            <div th:if="${#fields.hasErrors('statusName')}" class="text-danger mt-1">
+                <span th:each="err : ${#fields.errors('statusName')}" th:text="${err}"></span>
+            </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary">
+                <span th:text="${isEdit} ? 'Update Status' : 'Create Status'">Create Status</span>
+            </button>
+            <a th:href="@{/statuses/}" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+    </form>
+
+</div>
+</body>
+</html>

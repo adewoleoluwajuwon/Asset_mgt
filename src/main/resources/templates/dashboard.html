@@ -62,6 +62,15 @@
                 </div>
             </div>
         </div>
+<!--        Status Admin and manager-->
+        <div sec:authorize="hasAnyRole('ADMIN_MANAGER','STORE_MANAGER')" class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Asset Status List</h5>
+                <p class="card-text text-muted">Manage the statuses used by your assets.</p>
+                <a class="btn btn-outline-primary" th:href="@{/statuses/}">Open</a>
+            </div>
+        </div>
+
     </div>
 </div>
 

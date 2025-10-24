@@ -14,4 +14,8 @@ public interface AssetStatusService {
 	void deleteAssetStatus(Long id);
 	
 	List<AssetStatus> searchAssetStatus(String keyword);
+
+    AssetStatus updateAssetStatus(AssetStatus status);
+
+    void deleteAssetStatusById(Long id);
 }

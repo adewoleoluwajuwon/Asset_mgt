@@ -11,4 +11,6 @@ public interface AssetRepository extends JpaRepository<Assets, Long>{
 
 	List<Assets> findByDescriptionContainingIgnoreCase(String keyword);
 
+    long countByStatus_Id(Long statusId);
+
 }

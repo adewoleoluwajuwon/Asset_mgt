@@ -3,6 +3,7 @@ package com.Jguides.spingboot.service;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import com.Jguides.spingboot.Model.AssetStatus;
@@ -38,5 +39,23 @@ public class AssetStatusImpl implements AssetStatusService {
     @Override
     public AssetStatus saveAssetStatus(AssetStatus assetStatus) {
         return assetStatusRepository.save(assetStatus);
+    }
+
+    @Override
+    public AssetStatus updateAssetStatus(AssetStatus status) {
+        // JPA save updates when the entity has an ID
+        return assetStatusRepository.save(status);
+    }
+
+    public void deleteAssetStatusById(Long id) {
+        // optional: existence check
+        if (assetStatusRepository.existsById(id)) {
+            try {
+                assetStatusRepository.deleteById(id);
+            } catch (DataIntegrityViolationException ex) {
+                // If there’s a DB FK preventing delete, rethrow a clear message
+                throw ex; // controller already blocks when "in use"; this is just a safety net
+            }
+        }
     }
 }
