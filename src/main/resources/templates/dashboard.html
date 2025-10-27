@@ -1,13 +1,11 @@
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <html lang="en"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-<th:block th:replace="~{fragments/head :: pwaHead('Page Title')}"></th:block>
+<th:block th:replace="~{fragments/head :: pwaHead('Dashboard')}"></th:block>
+
 <head>
     <meta charset="UTF-8" />
-
     <meta name="mobile-web-app-capable" content="yes">
-
 
     <!-- PWA manifest and theme -->
     <link rel="manifest" href="/manifest.json">
@@ -20,28 +18,19 @@
     <link rel="apple-touch-icon" href="/icons/icon-192.png">
     <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon-180.png">
 
-
-
     <title>Dashboard</title>
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
+
 <body>
+<!-- ✅ Single clean navbar -->
 <nav class="navbar navbar-expand-lg bg-body-tertiary border-bottom">
     <div class="container">
-        <a class="navbar-brand" href="#" th:text="${#authentication?.name}">User</a>
-        <div class="ms-auto d-flex align-items-center gap-2">
-            <form th:action="@{/logout}" method="post" class="m-0">
-                <button class="btn btn-outline-secondary btn-sm" type="submit">Logout</button>
-            </form>
-        </div>
-    </div>
-
-    <div class="container">
-        <a class="navbar-brand" href="#" th:text="${#authentication?.name}">User</a>
+        <a class="navbar-brand fw-semibold" href="#" th:text="${#authentication?.name}">User</a>
 
         <div class="ms-auto d-flex align-items-center gap-2">
-            <!-- Install App button: hidden by default, shown by JS when eligible -->
+            <!-- Install App button (shown by JS when eligible) -->
             <button id="pwaInstallBtn" class="btn btn-sm btn-primary d-none" type="button">
                 Install App
             </button>
@@ -53,11 +42,12 @@
     </div>
 </nav>
 
+<!-- iOS install instructions -->
 <div id="iosInstallHint" class="alert alert-info d-none m-0 rounded-0">
     On iPhone/iPad: tap <strong>Share</strong> → <strong>Add to Home Screen</strong> to install.
 </div>
 
-
+<!-- Dashboard content -->
 <div class="container py-5">
     <h3 class="mb-4">Choose an operation</h3>
 
@@ -68,20 +58,20 @@
                 <div class="card-body d-flex flex-column">
                     <h5 class="card-title">Asset List</h5>
                     <p class="card-text flex-grow-1">View, search, create, edit and delete assets.</p>
-                    <div class="d-grid gap-2">
+                    <div class="d-grid">
                         <a class="btn btn-primary" th:href="@{/assets/}">Open Asset List</a>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Warehouses (ADMIN_MANAGER or STORE_MANAGER) -->
+        <!-- Warehouses -->
         <div class="col-12 col-md-6 col-lg-4" sec:authorize="hasAnyRole('ADMIN_MANAGER','STORE_MANAGER')">
             <div class="card h-100 shadow-sm">
                 <div class="card-body d-flex flex-column">
                     <h5 class="card-title">Warehouse List</h5>
                     <p class="card-text flex-grow-1">Manage warehouses (view, create, edit, delete).</p>
-                    <div class="d-grid gap-2">
+                    <div class="d-grid">
                         <a class="btn btn-primary" th:href="@{/warehouses/}">Open Warehouse List</a>
                     </div>
                 </div>
@@ -94,34 +84,39 @@
                 <div class="card-body d-flex flex-column">
                     <h5 class="card-title">Users List</h5>
                     <p class="card-text flex-grow-1">Add new users, edit roles, reset passwords, or delete users.</p>
-                    <div class="d-grid gap-2">
+                    <div class="d-grid">
                         <a class="btn btn-warning" th:href="@{/users/}">Open Users</a>
                     </div>
                 </div>
             </div>
         </div>
-<!--        Status Admin and manager-->
-        <div sec:authorize="hasAnyRole('ADMIN_MANAGER','STORE_MANAGER')" class="card shadow-sm">
-            <div class="card-body">
-                <h5 class="card-title">Asset Status List</h5>
-                <p class="card-text text-muted">Manage the statuses used by your assets.</p>
-                <a class="btn btn-outline-primary" th:href="@{/statuses/}">Open</a>
+
+        <!-- Statuses -->
+        <div class="col-12 col-md-6 col-lg-4" sec:authorize="hasAnyRole('ADMIN_MANAGER','STORE_MANAGER')">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">Asset Status List</h5>
+                    <p class="card-text flex-grow-1 text-muted">Manage the statuses used by your assets.</p>
+                    <div class="d-grid">
+                        <a class="btn btn-outline-primary" th:href="@{/statuses/}">Open</a>
+                    </div>
+                </div>
             </div>
         </div>
-
     </div>
 </div>
 
+<!-- Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <!-- Register service worker -->
 <script>
     if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/service-worker.js')
-          .then(reg => console.log('✅ Service Worker registered:', reg.scope))
-          .catch(err => console.error('❌ Service Worker registration failed:', err));
-      });
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/service-worker.js')
+                .then(reg => console.log('✅ Service Worker registered:', reg.scope))
+                .catch(err => console.error('❌ Service Worker registration failed:', err));
+        });
     }
 </script>
 
